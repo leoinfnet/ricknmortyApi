@@ -1,6 +1,6 @@
 package br.com.infnet.util;
 
-import br.com.infnet.exception.EpisodioNotFoundException;
+import br.com.infnet.exception.ResourceNotFoundException;
 import br.com.infnet.model.Episodio;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -24,7 +24,8 @@ public class EpisodioUtil {
             HttpClient client = HttpClient.newBuilder().build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if(response.statusCode() == 404){
-                throw new EpisodioNotFoundException("Not Found");
+                throw new ResourceNotFoundException("episodio não encontrado");
+
             }
             //ObjectMapper objectMapper = new ObjectMapper();
             ObjectMapper objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();

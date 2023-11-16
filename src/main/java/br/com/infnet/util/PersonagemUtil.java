@@ -1,11 +1,13 @@
 package br.com.infnet.util;
 
-import br.com.infnet.exception.PersonagemNotFoundException;
+import br.com.infnet.exception.ResourceNotFoundException;
 import br.com.infnet.model.PayloadPersonagemList;
 import br.com.infnet.model.Personagem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,21 +17,25 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PersonagemUtil {
+    private static Logger LOGGER = LoggerFactory.getLogger(PersonagemUtil.class);
+    private final String URL = "https://rickandmortyapi.com/api/character/";
     public Personagem getPersonagem(int id) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .version(HttpClient.Version.HTTP_2)
-                    .uri(new URI("https://rickandmortyapi.com/api/character/" + id))
+                    .uri(new URI(URL + id))
                     .build();
             HttpClient client = HttpClient.newBuilder().build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if(response.statusCode() == 404){
-                throw new PersonagemNotFoundException("Personagem não localizado");
+                throw  new ResourceNotFoundException("Personagem não localizado");
             }
             ObjectMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
 
@@ -49,7 +55,7 @@ public class PersonagemUtil {
             HttpClient client = HttpClient.newBuilder().build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if(response.statusCode() == 404){
-                throw new PersonagemNotFoundException("Personagem não localizado");
+                throw  new ResourceNotFoundException("Personagem não localizado");
             }
             ObjectMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
 
@@ -76,14 +82,20 @@ public class PersonagemUtil {
         return personagens.subList(0,size).stream().map(this::getPersonagem).toList();
     }
     public void getAvatar(Personagem personagem){
+        LOGGER.info("iniciando metodo getAvatar");
         try {
+
             HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .version(HttpClient.Version.HTTP_2)
                     .uri(new URI(personagem.getImage())).build();
 
             HttpClient client = HttpClient.newBuilder().build();
+            LocalDateTime start = LocalDateTime.now();
             HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+            LocalDateTime end = LocalDateTime.now();
+            long between = ChronoUnit.MILLIS.between(start, end);
+            LOGGER.info("Tempo de execucao do metodo: " + between + " MS para url: " + personagem.getImage());
             String fileName = "avatar/" + personagem.getName() + ".png";
             Files.write(Path.of(fileName), response.body());
         } catch (URISyntaxException | IOException | InterruptedException e) {
@@ -104,7 +116,7 @@ public class PersonagemUtil {
 
     public PayloadPersonagemList buscarPeloNome(String nome) {
         try {
-            String url = "https://rickandmortyapi.com/api/character?name=" + nome;
+            String url = URL + "?name=" + nome;
             HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .version(HttpClient.Version.HTTP_2)

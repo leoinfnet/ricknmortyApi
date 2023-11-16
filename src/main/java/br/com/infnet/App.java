@@ -1,9 +1,9 @@
 package br.com.infnet;
 
-import br.com.infnet.model.Episodio;
-import br.com.infnet.model.PayloadPersonagemList;
-import br.com.infnet.model.Personagem;
+import br.com.infnet.model.*;
+import br.com.infnet.util.ConsoleUtil;
 import br.com.infnet.util.EpisodioUtil;
+import br.com.infnet.util.LocationUtil;
 import br.com.infnet.util.PersonagemUtil;
 
 import java.util.List;
@@ -17,34 +17,14 @@ public class App
 {
     public static void main( String[] args ) {
 
-        System.out.println( "Bem vindo a API de Rick N Morty");
-        System.out.println("Digite a Opcao Desejada");
-        System.out.println(" 1 - Buscar Episodio");
-        System.out.println(" 2 - Buscar Avatar");
-        System.out.println(" 3 - Buscar Personagem pelo ID");
-        System.out.println(" 4 - Buscar Personagem pelo nome");
-        System.out.println(" 5 - Buscar Avatar pelo nome");
+        ConsoleUtil.menuPrincipal();
         Scanner scanner = new Scanner(System.in);
         EpisodioUtil episodioUtil = new EpisodioUtil();
         PersonagemUtil personagemUtil = new PersonagemUtil();
         int opcao = scanner.nextInt();
         switch (opcao){
             case 1: {
-                System.out.println("Digite o numero do episodio");
-                int episodioId = scanner.nextInt();
-                Episodio episodio = episodioUtil.getById(episodioId);
-                List<Personagem> personagens = personagemUtil.getPersonagens(episodio.getCharacters(), 3);
-                System.out.println("Nome: " + episodio.getName());
-                System.out.println("Data que foi ao ar': " + episodio.getAirDate());
-                System.out.println("Personagens: ");
-                personagens.forEach(personagem -> {
-
-                    System.out.println("Nome: " + personagem.getName());
-                    System.out.println("Status: " + personagem.getStatus());
-                    System.out.println("Origem: " + personagem.getOrigin().getName());
-                    System.out.println("======================");
-                });
-
+                getEpisodio();
                 break;
             }
             case 2: {
@@ -81,7 +61,6 @@ public class App
                     System.out.println("======================");
                 });
                 break;
-
             }
             case 5: {
                 System.out.println("Digite o nome do Personagem");
@@ -90,7 +69,74 @@ public class App
                 System.out.println("Imagem baixada");
                 break;
             }
-        }
+            case 6: {
+                LocationUtil locationUtil = new LocationUtil();
+                PayloadLocationsList allLocations = locationUtil.getAllLocations();
+                System.out.println("Total de Locations: " + allLocations.getInfo().getCount());
+                int page = 1;
+                System.out.println("Page: " + page);
+                List<Location> results = allLocations.getResults();
+                results.forEach(location -> {
+                    System.out.println("ID: " + location.getId());
+                    System.out.println("Nome: " + location.getName());
+                    System.out.println("Type: " + location.getType());
+                    System.out.println("======================");
+                });
+                while (page < allLocations.getInfo().getPages() ) {
+                    System.out.println("(A) -> Anterior ; (P) -> Proxima ; (S) -> Sair");
+                    String escolhaPaginacao = scanner.next();
+                    switch (escolhaPaginacao){
+                        case "a": {
+                            allLocations = locationUtil.getAllLocations(page--);
+                            System.out.println("Page: " + page);
+                            results = allLocations.getResults();
+                            results.forEach(location -> {
+                                System.out.println("ID: " + location.getId());
+                                System.out.println("Nome: " + location.getName());
+                                System.out.println("Type: " + location.getType());
+                                System.out.println("======================");
+                            });
+                            break;
+                        }
+                        case "p": {
+                            allLocations = locationUtil.getAllLocations(++page);
+                            System.out.println("Page: " + page);
+                            results = allLocations.getResults();
+                            results.forEach(location -> {
+                                System.out.println("ID: " + location.getId());
+                                System.out.println("Nome: " + location.getName());
+                                System.out.println("Type: " + location.getType());
+                                System.out.println("======================");
+                            });
+                            break;
+                        }
+                        default:
 
+                    }
+                }
+            }
+        }
     }
+
+    private static void getEpisodio() {
+        Scanner scanner = new Scanner(System.in);
+        EpisodioUtil episodioUtil = new EpisodioUtil();
+        PersonagemUtil personagemUtil = new PersonagemUtil();
+        System.out.println("Digite o numero do episodio");
+        int episodioId = scanner.nextInt();
+        Episodio episodio = episodioUtil.getById(episodioId);
+        List<Personagem> personagens = personagemUtil.getPersonagens(episodio.getCharacters(), 3);
+        System.out.println("Nome: " + episodio.getName());
+        System.out.println("Data que foi ao ar': " + episodio.getAirDate());
+        System.out.println("Personagens: ");
+        personagens.forEach(personagem -> {
+
+            System.out.println("Nome: " + personagem.getName());
+            System.out.println("Status: " + personagem.getStatus());
+            System.out.println("Origem: " + personagem.getOrigin().getName());
+            System.out.println("======================");
+        });
+    }
+
+
 }

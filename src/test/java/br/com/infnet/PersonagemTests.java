@@ -1,6 +1,6 @@
 package br.com.infnet;
 
-import br.com.infnet.exception.PersonagemNotFoundException;
+import br.com.infnet.exception.ResourceNotFoundException;
 import br.com.infnet.model.PayloadPersonagemList;
 import br.com.infnet.model.Personagem;
 import br.com.infnet.util.PersonagemUtil;
@@ -33,7 +33,7 @@ public class PersonagemTests {
     @DisplayName("Deve retornar uma exception para um Personagem que nao existe")
     public void buscaPersonagemQueNaoExiste(){
         PersonagemUtil personagemUtil = new PersonagemUtil();
-        assertThrows(PersonagemNotFoundException.class, () ->{
+        assertThrows(ResourceNotFoundException.class, () ->{
             Personagem rick =  personagemUtil.getPersonagem(-1);
         });
     }

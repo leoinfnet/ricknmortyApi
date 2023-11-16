@@ -1,6 +1,6 @@
 package br.com.infnet;
 
-import br.com.infnet.exception.EpisodioNotFoundException;
+import br.com.infnet.exception.ResourceNotFoundException;
 import br.com.infnet.model.Episodio;
 import br.com.infnet.util.EpisodioUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,7 @@ public class EpisodioTests {
     @DisplayName("Deve retornar uma exceptpion para um episodio inexistente")
     public void testaEpisodioInexistente(){
         EpisodioUtil episodioUtil = new EpisodioUtil();
-        assertThrows(EpisodioNotFoundException.class, () -> {
+        assertThrows(ResourceNotFoundException.class, () -> {
             Episodio episodio = episodioUtil.getById(-1);
         });
     }

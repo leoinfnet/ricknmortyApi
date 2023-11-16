@@ -82,9 +82,9 @@ public class App
                     System.out.println("Type: " + location.getType());
                     System.out.println("======================");
                 });
-                while (page < allLocations.getInfo().getPages() ) {
-                    System.out.println("(A) -> Anterior ; (P) -> Proxima ; (S) -> Sair");
-                    String escolhaPaginacao = scanner.next();
+                System.out.println("(A) -> Anterior ; (P) -> Proxima ; (S) -> Sair");
+                String escolhaPaginacao = scanner.next();
+                while (!escolhaPaginacao.equalsIgnoreCase("S") ) {
                     switch (escolhaPaginacao){
                         case "a": {
                             allLocations = locationUtil.getAllLocations(page--);
@@ -110,10 +110,13 @@ public class App
                             });
                             break;
                         }
-                        default:
+                        default: break;
 
                     }
+                    System.out.println("(A) -> Anterior ; (P) -> Proxima ; (S) -> Sair");
+                    escolhaPaginacao = scanner.next();
                 }
+                break;
             }
         }
     }
